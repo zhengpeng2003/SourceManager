@@ -1,14 +1,23 @@
-﻿#include <QApplication>
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
+#include <QApplication>
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    a.setApplicationName("智能课程表（文本版）");
-    a.setApplicationVersion("1.0");
+    QApplication app(argc, argv);
 
-    MainWindow w;
-    w.show();
+    // 设置应用程序信息
+    app.setApplicationName("课程管理系统");
+    app.setApplicationVersion("3.0");
+    app.setOrganizationName("EducationSoft");
 
-    return a.exec();
+    // 设置全局字体
+    QFont font("Microsoft YaHei", 10);
+    app.setFont(font);
+
+    MainWindow window;
+    window.setWindowTitle("课程管理系统 v3.0 - 完整功能版");
+    window.resize(1200, 800);
+    window.show();
+
+    return app.exec();
 }

@@ -9,7 +9,10 @@ class Course {
 public:
     Course();
 
-    // basic properties
+    // ID from DB (if -1 not yet saved)
+    int id() const;
+    void setId(int);
+
     QString name() const;
     void setName(const QString&);
 
@@ -22,7 +25,7 @@ public:
     QString location() const;
     void setLocation(const QString&);
 
-    // lesson timing stored as lesson index (1..12) or explicit times
+    // lesson timing stored as lesson index (1..12)
     int lessonIndex() const;
     void setLessonIndex(int idx);
 
@@ -31,7 +34,7 @@ public:
     QTime endTime() const;
     void setEndTime(const QTime&);
 
-    int weekDay() const;    // 1..7
+    int weekDay() const;    // 1..7 (Qt: 1=Monday)
     void setWeekDay(int);
 
     int startWeek() const;
@@ -39,15 +42,11 @@ public:
     int endWeek() const;
     void setEndWeek(int);
 
-    // derived
     int remainingDays() const;
     void computeDerived() const;
 
-    // serialize/deserialize
-    QString toLine() const;
-    static Course fromLine(const QString& line);
-
 private:
+    int m_id;
     QString m_name;
     QDate m_examDate;
     QString m_teacher;

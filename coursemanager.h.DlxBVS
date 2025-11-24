@@ -7,8 +7,8 @@
 #include <QSqlError>
 #include <QList>
 #include <QDate>
-#include <QColor>
 
+// 修改类名为 CourseData 避免冲突
 class CourseData
 {
 public:
@@ -21,17 +21,12 @@ public:
     QDate startDate;
     QDate endDate;
     QString teacher;
-    QDate examDate;
-    QString courseType;
-    double credits;
 
-    CourseData() : id(-1), dayOfWeek(1), startSlot(1), endSlot(1), credits(0) {}
+    CourseData() : id(-1), dayOfWeek(1), startSlot(1), endSlot(1) {}
     CourseData(const QString& name, int day, int start, int end, const QString& loc,
-               const QDate& startDate, const QDate& endDate, const QString& teacher = "",
-               const QDate& examDate = QDate(), const QString& courseType = "必修", double credits = 0)
+               const QDate& startDate, const QDate& endDate, const QString& teacher = "")
         : id(-1), name(name), dayOfWeek(day), startSlot(start), endSlot(end),
-        location(loc), startDate(startDate), endDate(endDate), teacher(teacher),
-        examDate(examDate), courseType(courseType), credits(credits) {}
+        location(loc), startDate(startDate), endDate(endDate), teacher(teacher) {}
 };
 
 class CourseManager : public QObject
@@ -48,24 +43,19 @@ public:
     bool deleteCourse(int id);
     QList<CourseData> getCoursesByWeek(const QDate &date);
     QList<CourseData> getAllCourses();
-    QList<CourseData> searchCourses(const QString &keyword);
     CourseData getCourseById(int id);
 
+    // 学期管理
     bool setCurrentSemester(const QString &semester);
     QString getCurrentSemester() const;
     QDate getSemesterStartDate() const;
     QDate getSemesterEndDate() const;
-
-    bool exportToCsv(const QString &filePath);
-    bool importFromCsv(const QString &filePath);
-    bool createBackup();
 
 private:
     QSqlDatabase m_db;
     QString m_currentSemester;
 
     bool createTables();
-    bool upgradeDatabase();
 };
 
 #endif // COURSEMANAGER_H
