@@ -1306,7 +1306,11 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		"S:\Qt 6\6.5.3\msvc2019_64\include\QtCore\qdir.h" \
 		"S:\Qt 6\6.5.3\msvc2019_64\include\QtCore\qfile.h" \
 		"S:\Qt 6\6.5.3\msvc2019_64\include\QtCore\qfiledevice.h" \
-		"S:\Qt 6\6.5.3\msvc2019_64\include\QtCore\qfileinfo.h"
+		"S:\Qt 6\6.5.3\msvc2019_64\include\QtCore\qfileinfo.h" \
+		"S:\Qt 6\6.5.3\msvc2019_64\include\QtCore\QSequentialAnimationGroup" \
+		"S:\Qt 6\6.5.3\msvc2019_64\include\QtCore\qsequentialanimationgroup.h" \
+		"S:\Qt 6\6.5.3\msvc2019_64\include\QtCore\QPauseAnimation" \
+		"S:\Qt 6\6.5.3\msvc2019_64\include\QtCore\qpauseanimation.h"
 
 debug\moc_coursemanager.obj: debug\moc_coursemanager.cpp 
 

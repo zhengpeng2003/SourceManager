@@ -41,7 +41,7 @@ class CourseManager : public QObject
 public:
     explicit CourseManager(QObject *parent = nullptr);
     ~CourseManager();
-
+    int getSemesterWeeks() const;
     bool initDatabase();
     bool addCourse(const CourseData &course);
     bool updateCourse(const CourseData &course);
@@ -52,6 +52,7 @@ public:
     CourseData getCourseById(int id);
 
     bool setCurrentSemester(const QString &semester);
+    bool setSemester(const QString &name, const QDate &start, const QDate &end);
     QString getCurrentSemester() const;
     QDate getSemesterStartDate() const;
     QDate getSemesterEndDate() const;

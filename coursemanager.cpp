@@ -1,4 +1,4 @@
-﻿#include "coursemanager.h"
+#include "coursemanager.h"
 #include <QDebug>
 #include <QDir>
 #include <QStandardPaths>
@@ -18,6 +18,20 @@ CourseManager::~CourseManager()
     }
 }
 
+
+    int CourseManager::getSemesterWeeks() const
+    {
+        QDate startDate = getSemesterStartDate();
+        QDate endDate = getSemesterEndDate();
+
+        if (!startDate.isValid() || !endDate.isValid() || startDate >= endDate) {
+            return 0;
+        }
+
+        return startDate.daysTo(endDate) / 7 + 1;
+    }
+
+
 bool CourseManager::initDatabase()
 {
     QString dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -33,7 +47,7 @@ bool CourseManager::initDatabase()
     m_db.setDatabaseName(dbPath);
 
     if (!m_db.open()) {
-        qDebug() << "Failed to open database:" << m_db.lastError().text();
+
         return false;
     }
 
@@ -71,7 +85,7 @@ bool CourseManager::createTables()
         ")";
 
     if (!query.exec(courseTable)) {
-        qDebug() << "Failed to create courses table:" << query.lastError().text();
+
         m_db.rollback();
         return false;
     }
@@ -85,7 +99,7 @@ bool CourseManager::createTables()
         ")";
 
     if (!query.exec(semesterTable)) {
-        qDebug() << "Failed to create semesters table:" << query.lastError().text();
+
         m_db.rollback();
         return false;
     }
@@ -152,7 +166,7 @@ bool CourseManager::upgradeDatabase()
             }
 
             if (!query.exec(addColumn)) {
-                qDebug() << "Failed to add column" << column << ":" << query.lastError().text();
+
                 return false;
             }
         }
@@ -186,7 +200,7 @@ bool CourseManager::addCourse(const CourseData &course)
     query.addBindValue(m_currentSemester);
 
     if (!query.exec()) {
-        qDebug() << "Failed to add course:" << query.lastError().text();
+
         QSqlDatabase::database().rollback();
         return false;
     }
@@ -449,6 +463,50 @@ QDate CourseManager::getSemesterEndDate() const
     }
 
     return QDate(2026, 1, 31);
+}
+
+bool CourseManager::setSemester(const QString &name, const QDate &start, const QDate &end)
+{
+    if (!start.isValid() || !end.isValid() || start >= end) {
+        return false;
+    }
+
+    QSqlDatabase::database().transaction();
+
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM semesters WHERE name=?");
+    query.addBindValue(name);
+
+    bool exists = false;
+    if (query.exec() && query.next()) {
+        exists = query.value(0).toInt() > 0;
+    }
+
+    bool ok = false;
+    if (exists) {
+        QSqlQuery update;
+        update.prepare("UPDATE semesters SET start_date=?, end_date=? WHERE name=?");
+        update.addBindValue(start.toString(Qt::ISODate));
+        update.addBindValue(end.toString(Qt::ISODate));
+        update.addBindValue(name);
+        ok = update.exec();
+    } else {
+        QSqlQuery insert;
+        insert.prepare("INSERT INTO semesters (name, start_date, end_date) VALUES (?, ?, ?)");
+        insert.addBindValue(name);
+        insert.addBindValue(start.toString(Qt::ISODate));
+        insert.addBindValue(end.toString(Qt::ISODate));
+        ok = insert.exec();
+    }
+
+    if (!ok) {
+        QSqlDatabase::database().rollback();
+        return false;
+    }
+
+    QSqlDatabase::database().commit();
+    m_currentSemester = name;
+    return true;
 }
 
 bool CourseManager::exportToCsv(const QString &filePath)

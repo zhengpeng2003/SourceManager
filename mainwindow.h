@@ -1,4 +1,4 @@
-﻿#ifndef MAINWINDOW_H
+#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -28,9 +28,9 @@ public:
 
     QLabel *createFormLabel(const QString &text);
     void showErrorMessage(const QString &message);
+    void updateWeeksLabel(QLabel *label, const QDate &startDate, const QDate &endDate);
 private slots:
     void onAddCourse();
-    void onEditTimeSlots();
     void onRefresh();
     void onSearch();
     void onExport();
@@ -39,13 +39,22 @@ private slots:
     void prevWeek();
     void nextWeek();
     void goToThisWeek();
+    void onToggleTheme();
+    void onSetSemester();
+    void showCourseSearchDialog();
 
 private:
+    void updateWeeksDisplay(QLabel* label, const QDate& startDate, const QDate& endDate);
+    void showSemesterDialog();
     Ui::MainWindow *ui;
     CourseManager *m_courseManager;
     QTimer *m_clockTimer;
     QDate m_currentWeekStart;
+    //
 
+    void displayAllCoursesInSearch(QTableWidget* table);
+    void searchCoursesInDialog(const QString& keyword, QTableWidget* table);
+    void showCourseDetailInSearch(int courseId);
     // UI组件指针
     QTableWidget *m_courseTable;
     QLabel *m_weekLabel;
@@ -72,9 +81,16 @@ private:
     void shakeWidget(QWidget *widget);
     void fadeInDialog(QDialog *dialog);
 
+
     // 工具函数
     QColor getCourseColor(const QString &courseType);
+    void applyDarkStyles();
+    void applyLightStyles();
 private:
+    bool m_canNavigateToNextWeek;
+    void showSemesterEndAnimation();
+    bool isLastWeek() const;
+    bool m_isDarkMode;
     QString getInputStyle() {
         return R"(
         QLineEdit {
@@ -218,6 +234,7 @@ private:
         }
     )").arg(color);
     }
+    void updateWeeksLabel(QLabel *, QDate, QDate);
 };
 
 #endif // MAINWINDOW_H
