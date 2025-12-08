@@ -1,10 +1,9 @@
-﻿#ifndef MAINWINDOW_H
+#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
 #include <QTimer>
 #include <QDate>
-#include <QCloseEvent>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
 #include <QGraphicsOpacityEffect>
@@ -26,9 +25,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-protected:
-    void closeEvent(QCloseEvent *event) override;
 
     QLabel *createFormLabel(const QString &text);
     void showErrorMessage(const QString &message);
