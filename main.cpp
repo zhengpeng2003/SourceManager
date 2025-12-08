@@ -9,13 +9,13 @@ int main(int argc, char *argv[])
     app.setApplicationName("课程管理系统");
     app.setApplicationVersion("3.0");
     app.setOrganizationName("EducationSoft");
-
     // 设置全局字体
     QFont font("Microsoft YaHei", 10);
     app.setFont(font);
 
     MainWindow window;
     window.setWindowTitle("课程管理系统 v3.0 - 完整功能版");
+    window.setWindowIcon(QIcon(":/new/prefix1/res/ioc.png"));
     window.resize(1200, 800);
     window.show();
 

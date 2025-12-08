@@ -1,5 +1,4 @@
-﻿
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QLabel>
 #include <QPushButton>
@@ -29,6 +28,7 @@
 #include <QFileDialog>
 #include <QSequentialAnimationGroup>
 #include <QPauseAnimation>
+#include <QCloseEvent>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -619,7 +619,7 @@ void MainWindow::populateCourseTable()
             }
         }
     } catch (...) {
-        qDebug() << "Error populating course table";
+
     }
 
     // 恢复信号和更新
@@ -648,7 +648,7 @@ void MainWindow::onRefresh()
         m_courseTable->setGraphicsEffect(effect);
 
         QPropertyAnimation *animation = new QPropertyAnimation(effect, "opacity", this);
-        animation->setDuration(400);
+        animation->setDuration(1000);
         animation->setKeyValueAt(0, 1.0);
         animation->setKeyValueAt(0.3, 0.6);
         animation->setKeyValueAt(1, 1.0);
@@ -1982,7 +1982,7 @@ void MainWindow::animateButton(QWidget *button)
     button->setProperty("animationRunning", true);
 
     QPropertyAnimation *animation = new QPropertyAnimation(button, "geometry", this);
-    animation->setDuration(200);
+    animation->setDuration(1000);
     animation->setKeyValueAt(0, button->geometry());
     animation->setKeyValueAt(0.5, button->geometry().adjusted(-2, -2, 2, 2));
     animation->setKeyValueAt(1, button->geometry());
@@ -2036,23 +2036,18 @@ void MainWindow::fadeInWidget(QWidget *widget)
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void MainWindow::fadeInDialog(QDialog *dialog)
-{
+void MainWindow::fadeInDialog(QDialog *dialog) {
     if (!dialog) return;
-    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect(dialog);
-    dialog->setGraphicsEffect(effect);
-    effect->setOpacity(0.0);
-
-    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->setWindowOpacity(0.0);
     dialog->show();
-
-    QPropertyAnimation *animation = new QPropertyAnimation(effect, "opacity", this);
-    animation->setDuration(300);
-    animation->setStartValue(0.0);
-    animation->setEndValue(1.0);
-    animation->setEasingCurve(QEasingCurve::OutCubic);
-    animation->start(QAbstractAnimation::DeleteWhenStopped);
+    auto *anim = new QPropertyAnimation(dialog, "windowOpacity", this);
+    anim->setDuration(1000);
+    anim->setStartValue(0.0);
+    anim->setEndValue(1.0);
+    anim->setEasingCurve(QEasingCurve::OutCubic);
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
+
 
 void MainWindow::pulseAnimation(QWidget *widget)
 {
@@ -2073,7 +2068,7 @@ void MainWindow::shakeWidget(QWidget *widget)
     if (!widget) return;
 
     QPropertyAnimation *animation = new QPropertyAnimation(widget, "pos", this);
-    animation->setDuration(500);
+    animation->setDuration(1000);
     animation->setKeyValueAt(0, widget->pos());
     animation->setKeyValueAt(0.1, widget->pos() + QPoint(5, 0));
     animation->setKeyValueAt(0.2, widget->pos() + QPoint(-5, 0));
@@ -2131,29 +2126,29 @@ void MainWindow::showSemesterDialog()
 
     // 使用与添加课程相同的对话框样式
     dialog.setStyleSheet(R"(
-        QDialog {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                stop:0 #f8fafc, stop:1 #e2e8f0);
-            font-family: 'Microsoft YaHei', 'Segoe UI';
-        }
-        QGroupBox {
-            background: white;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
-            margin-top: 10px;
-            padding-top: 15px;
-            font-weight: 600;
-            color: #1e293b;
-            font-size: 14px;
-        }
-        QGroupBox::title {
-            subcontrol-origin: margin;
-            left: 12px;
-            padding: 0 8px 0 8px;
-            color: #475569;
-            font-weight: 600;
-            font-size: 13px;
-        }
+QDialog {
+        background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+            stop:0 #f8fafc, stop:1 #e2e8f0);
+        font-family: 'Microsoft YaHei', 'Segoe UI';
+    }
+    QGroupBox {
+        background: white;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        margin-top: 10px;
+        padding-top: 15px;
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 14px;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        left: 12px;
+        padding: 0 8px;
+        color: #475569;
+        font-weight: 600;
+        font-size: 13px;
+    }
         /* 日历控件样式 */
         QCalendarWidget {
             background: white;
@@ -3321,4 +3316,20 @@ void MainWindow::showCourseDetailInSearch(int courseId)
     mainLayout->addWidget(buttonWidget);
     connect(closeBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
     dialog.exec();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QMessageBox::StandardButton result = QMessageBox::question(
+        this,
+        tr("确认退出"),
+        tr("是否确认关闭程序？"),
+        QMessageBox::Yes | QMessageBox::No,
+        QMessageBox::No);
+
+    if (result == QMessageBox::Yes) {
+        event->accept();
+    } else {
+        event->ignore();
+    }
 }
