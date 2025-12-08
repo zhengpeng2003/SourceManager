@@ -29,6 +29,7 @@
 #include <QFileDialog>
 #include <QSequentialAnimationGroup>
 #include <QPauseAnimation>
+#include <QCloseEvent>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -3321,4 +3322,20 @@ void MainWindow::showCourseDetailInSearch(int courseId)
     mainLayout->addWidget(buttonWidget);
     connect(closeBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
     dialog.exec();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QMessageBox::StandardButton result = QMessageBox::question(
+        this,
+        tr("确认退出"),
+        tr("是否确认关闭程序？"),
+        QMessageBox::Yes | QMessageBox::No,
+        QMessageBox::No);
+
+    if (result == QMessageBox::Yes) {
+        event->accept();
+    } else {
+        event->ignore();
+    }
 }
